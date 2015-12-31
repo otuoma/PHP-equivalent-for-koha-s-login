@@ -31,5 +31,5 @@
         }
         mysql_close($con);
     }else{ //form is not submitted
-    echo "go to home page";
+    echo "<a href='http://networkbooks.co.ke'>Go Home</a>";
 ?>
