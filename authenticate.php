@@ -8,13 +8,17 @@
         $userid = $_POST['user'];
         $password = $_POST['pass'];
         
-        $con = mysql_connect($dbhost, $dbuser, $dbpassword) or  die("Could not connect: " . mysql_error());
-
-        mysql_select_db($dbname);
+        $con = new PDO("mysql:dbname='{$dbname}';host='{$dbhost}';charset=utf8", '{$dbuser}', '{$dbpassword}');
+        $con->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
-        $result =  mysql_query("SELECT password FROM borrowers WHERE userid = '{$userid}' LIMIT 1;");
-
-        while ($row = mysql_fetch_array($result)) {
+        $stmt = $con->prepare("SELECT password FROM borrowers WHERE userid = ? LIMIT 1;");
+        $stmt->bind_param('s', $userid);
+        
+        $stmt->execute();
+        
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
 
             //for koha 3.13 and earlier
             $old_hash = rtrim(base64_encode(pack('H*', md5($password))), '=');
